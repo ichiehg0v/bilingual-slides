@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Configuration
-    const totalSlides = 47; // We have 47 slides from the PDF conversion
+    const totalSlides = 47; // Update this with your actual number of slides
     let currentSlide = 1;
     
     // Elements

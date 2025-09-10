@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雙語 PDF 投影片同步瀏覽器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .slides-container {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 60px);
+        }
+
+        .slide-section {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .pdf-container {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .controls {
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(20, 20, 20, 0.8);
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        #slideCounter {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .info {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <div class="slide-section" id="leftSlides">
+            <!-- 左側 PDF -->
+            <embed src="leftin/[面海松] 活動行前線上訓練暨破冰交流活動.pdf" 
+                   type="application/pdf" 
+                   class="pdf-container" 
+                   id="leftPdf">
+        </div>
+        <div class="slide-section" id="rightSlides">
+            <!-- 右側 PDF -->
+            <embed src="rightin/9_12 面海松週五公務員交流專場.pdf" 
+                   type="application/pdf" 
+                   class="pdf-container" 
+                   id="rightPdf">
+        </div>
+    </div>
+    
+    <div class="controls">
+        <div class="navigation">
+            <button id="prevBtn">上一頁</button>
+            <span id="slideCounter">1 / ?</span>
+            <button id="nextBtn">下一頁</button>
+        </div>
+    </div>
+    
+    <div class="info">
+        <p>使用方向鍵 ← → 或滑鼠滾輪導航，空白鍵前進一頁</p>
+        <p><a href="index.html" style="color: #4a9df8;">切換到圖片模式</a></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 元素
+            const leftPdf = document.getElementById('leftPdf');
+            const rightPdf = document.getElementById('rightPdf');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const slideCounter = document.getElementById('slideCounter');
+            
+            let currentPage = 1;
+            let totalPages = 0; // 將在PDF加載完成後設置
+
+            // 按鈕點擊事件
+            prevBtn.addEventListener('click', prevPage);
+            nextBtn.addEventListener('click', nextPage);
+
+            // 鍵盤導航
+            document.addEventListener('keydown', function(e) {
+                switch (e.key) {
+                    case 'ArrowLeft':
+                    case 'ArrowUp':
+                        prevPage();
+                        break;
+                    case 'ArrowRight':
+                    case 'ArrowDown':
+                    case ' ': // 空格鍵
+                        nextPage();
+                        break;
+                }
+            });
+
+            // 滑鼠滾輪導航
+            document.addEventListener('wheel', function(e) {
+                // 防止頁面滾動
+                e.preventDefault();
+                
+                // 判斷方向
+                if (e.deltaY > 0) {
+                    nextPage();
+                } else {
+                    prevPage();
+                }
+            }, { passive: false });
+
+            // 前往上一頁
+            function prevPage() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updatePdfPage();
+                }
+            }
+
+            // 前往下一頁
+            function nextPage() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updatePdfPage();
+                }
+            }
+
+            // 更新 PDF 頁面
+            function updatePdfPage() {
+                // 注意：這裡需要 PDF 閱讀器的 API 支援
+                // 不同的 PDF 瀏覽器元素可能有不同的 API
+                // 以下是一個假設的實現，實際上需要根據瀏覽器支援調整
+                
+                // 更新計數器
+                slideCounter.textContent = `${currentPage} / ${totalPages}`;
+                
+                // 這裡實際上無法直接控制內嵌 PDF 的頁面
+                // 您可能需要使用 PDF.js 或其他專用庫
+                console.log(`Navigating to page ${currentPage}`);
+            }
+
+            // 提示使用者
+            slideCounter.textContent = "加載中...";
+            
+            // 注意：大多數瀏覽器的內嵌 PDF 閱讀器不提供 JavaScript API 控制
+            // 要實現頁面同步，建議使用 PDF.js 庫
+            
+            // 模擬頁面加載完成事件
+            setTimeout(function() {
+                totalPages = 47; // 這應該動態獲取
+                slideCounter.textContent = `${currentPage} / ${totalPages}`;
+                
+                // 提示用戶
+                alert("注意：內嵌的 PDF 瀏覽器可能無法通過JavaScript控制頁面切換。\n為了完整功能，建議使用PDF.js庫。\n目前這是一個基本的示範。");
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
